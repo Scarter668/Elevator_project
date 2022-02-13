@@ -1,3 +1,8 @@
+/**
+ * @file
+ * @brief main program of the application
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
@@ -41,11 +46,18 @@ int main(){
                 elevio_buttonLamp(f, b, btnPressed);
             }
         }
+        if(floor !=-1){
+            elevio_floorIndicator(floor);
+        }
 
         if(elevio_obstruction()){
             elevio_stopLamp(1);
+            elevio_doorOpenLamp(1);
+
         } else {
             elevio_stopLamp(0);
+            elevio_doorOpenLamp(0);
+
         }
         
         if(elevio_stopButton()){
