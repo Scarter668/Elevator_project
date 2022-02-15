@@ -1,2 +1,6 @@
 latex/
 html/
+build/
+elevator
+source/.vscode/
+

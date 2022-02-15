@@ -10,7 +10,9 @@ EXCLUDE     = '*test*'
 SOURCEDIR = source
 OBJECTDIR = build
 
+#  $(patsubs pattern, replacement, text)
 SOURCES := $(patsubst $(SOURCEDIR)/%, %, $(shell find $(SOURCEDIR) -name '*.c'  ! -name $(EXCLUDE)  ! -path $(EXCLUDE)))
+#  $(addprefix prefix, names) . var:a = b => subsititutes ending a with b. Ex: foo.a => foo.b
 OBJECTS = $(addprefix $(OBJECTDIR)/, $(SOURCES:.c=.o))
 
 all: $(EXECUTABLE) 

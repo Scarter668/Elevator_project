@@ -8,7 +8,12 @@
 #include <signal.h>
 #include <time.h>
 #include "driver/elevio.h"
+#include "timer.h"
 
+#define bool int
+#define true 1
+#define false 0
+static bool was_obstruction = false;
 
 
 int main(){
@@ -53,11 +58,22 @@ int main(){
         if(elevio_obstruction()){
             elevio_stopLamp(1);
             elevio_doorOpenLamp(1);
-
+            was_obstruction = true;
+            
         } else {
             elevio_stopLamp(0);
-            elevio_doorOpenLamp(0);
-
+            if(was_obstruction){
+                was_obstruction = false;
+                start_timer();
+            }
+            if(!timer_active()){ // if not active timer
+                elevio_doorOpenLamp(0);
+            } else{ 
+                if(timer_is_timeout()){ //if timeout
+                elevio_doorOpenLamp(0);
+                }
+            }
+            
         }
         
         if(elevio_stopButton()){
