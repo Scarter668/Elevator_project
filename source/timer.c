@@ -1,3 +1,7 @@
+/**
+ * @file
+ * @brief Implementation file for timer.h
+ */
 
 
 #include "timer.h"
@@ -18,7 +22,7 @@
 // }
 
 
-void start_timer(){
+void timer_start(){
 
     m_active_timer = true;
     //timeout = false;
@@ -29,11 +33,11 @@ void stop_timer(){
     m_active_timer = false;
 }
 
-bool timer_active(){
+bool timer_isActive(){
     return m_active_timer;
 }
 
-bool timer_is_timeout(){
+bool timer_isTimeout(){
     if(m_active_timer){
         
         //double diff = difftime(time(NULL),clock_start);

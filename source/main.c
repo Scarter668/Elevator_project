@@ -8,7 +8,9 @@
 #include <signal.h>
 #include <time.h>
 #include "driver/elevio.h"
+
 #include "timer.h"
+#include "FSM.h"
 
 #define bool int
 #define true 1
@@ -64,12 +66,12 @@ int main(){
             elevio_stopLamp(0);
             if(was_obstruction){
                 was_obstruction = false;
-                start_timer();
+                timer_start();
             }
-            if(!timer_active()){ // if not active timer
+            if(!timer_isActive()){ // if not active timer
                 elevio_doorOpenLamp(0);
             } else{ 
-                if(timer_is_timeout()){ //if timeout
+                if(timer_isTimeout()){ //if timeout
                 elevio_doorOpenLamp(0);
                 }
             }
@@ -80,9 +82,13 @@ int main(){
             elevio_motorDirection(DIRN_STOP);
             break;
         }
+        if(ass()){
+            printf(" \n");
+        }
         
         nanosleep(&(struct timespec){0, 20*1000*1000}, NULL);
     }
+    
 
     return 0;
 }

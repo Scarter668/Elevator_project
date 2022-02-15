@@ -5,15 +5,13 @@
 
 #pragma once
 //#include <pthread.h>
-#include <stdio.h>
 //#include <unistd.h>
 
 #include <time.h>
 
 
-
 /**
- * @brief Definerd @c bool , @c true , and @c false 
+ * @brief Definerd @c bool , @c true , and @c false
  * in order to increase readability
  */
 #define bool int
@@ -23,7 +21,7 @@
 /**
  * @brief The timeout lenght in seconds
  */
-#define TIMEOUT_LENGHT 3.0 
+#define TIMEOUT_LENGHT 3.0
 
 //static pthread_t newthread;
 //void* printHello(void* arg);
@@ -44,22 +42,22 @@ static time_t m_clock_start;
 
 
 /**
- * @brief Starts the timer by regitering the current time.   
+ * @brief Starts the timer by regitering the current time.
  */
-void start_timer();
+void timer_start();
 
 
 /**
  * @brief Checks if a timer is active
- * 
+ *
  * @return true or false depending on @p m_active_timer
  */
-bool timer_active();
+bool timer_isActive();
 
 /**
  * @brief Checks if the timer has timed out, and deactivates it if so.
  *
- * @return true or false depending on the duration of the timer 
+ * @return true or false depending on the duration of the timer
  */
-bool timer_is_timeout();
+bool timer_isTimeout();
 
