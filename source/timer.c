@@ -22,6 +22,16 @@
 // }
 
 
+/**
+ * @brief Keep track of wheter or not there is an active timer
+ */
+static bool m_active_timer;
+
+/**
+ * @brief Stores the time the timer was started to be combared with @p TIMEOUT_LENGHT
+ */
+static time_t m_clock_start;
+
 void timer_start(){
 
     m_active_timer = true;
@@ -39,19 +49,19 @@ bool timer_isActive(){
 
 bool timer_isTimeout(){
     if(m_active_timer){
-        
-        //double diff = difftime(time(NULL),clock_start);
-        //printf("Difftime ney %f\n", diff);
-        if( difftime(time(NULL) ,m_clock_start) >= TIMEOUT_LENGHT){
+
+        if(difftime(time(NULL) ,m_clock_start) >= TIMEOUT_LENGHT){
             stop_timer();
-            //timeout = true;
-            //double diff = difftime(clock_start, time(NULL));
-            //printf("Difftime yey%f\n", diff);
             return true;
         }
     }
 
     return false;
 }
+
+void timer_init(){
+    m_active_timer = false;
+    m_clock_start = time(NULL);
+};
 
 

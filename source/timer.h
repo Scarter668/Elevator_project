@@ -29,17 +29,6 @@
 //bool timeout;
 
 
-/**
- * @brief Keep track of wheter or not there is an active timer
- */
-static bool m_active_timer;
-
-/**
- * @brief Stores the time the timer was started to be combared with @p TIMEOUT_LENGHT
- */
-static time_t m_clock_start;
-
-
 
 /**
  * @brief Starts the timer by regitering the current time.
@@ -61,3 +50,8 @@ bool timer_isActive();
  */
 bool timer_isTimeout();
 
+
+/**
+ * @brief Initiates the static variables used by timer
+ */
+void timer_init();

@@ -12,6 +12,12 @@
 #include "timer.h"
 #include "FSM.h"
 
+//to test
+#include "queue.h"
+
+
+
+
 #define bool int
 #define true 1
 #define false 0
@@ -20,11 +26,34 @@ static bool was_obstruction = false;
 
 int main(){
     elevio_init();
+    timer_init();
+    queue_init();
     
     printf("=== Example Program ===\n");
     printf("Press the stop button on the elevator panel to exit\n");
 
     elevio_motorDirection(DIRN_UP);
+
+
+    
+    Button_t b;
+    b.floor_level_from = 1;
+    b.button_type = BUTTON_CAB;
+    //printf("Val1 %d \n", b.floor_level_from);
+
+    queue_createOrder(&b);
+    b.floor_level_from = 2;
+    //printf("Val2 %d \n", b.floor_level_from);
+
+    queue_createOrder(&b);
+
+    b.floor_level_from = 3;
+    queue_createOrder(&b);
+
+    b.floor_level_from = 1;
+    queue_createOrder(&b);
+    //printf("Val3 %d \n", b.floor_level_from);
+
 
     while(1){
         int floor = elevio_floorSensor();
@@ -49,6 +78,7 @@ int main(){
                     if(f < floor &&  floor != -1){
                         elevio_motorDirection(DIRN_DOWN);
                     }
+                    queue_clear_all();
                 }
                 elevio_buttonLamp(f, b, btnPressed);
             }
@@ -71,24 +101,24 @@ int main(){
             if(!timer_isActive()){ // if not active timer
                 elevio_doorOpenLamp(0);
             } else{ 
+
                 if(timer_isTimeout()){ //if timeout
                 elevio_doorOpenLamp(0);
+                queue_print_queue();
                 }
-            }
             
+            }
+
         }
         
         if(elevio_stopButton()){
             elevio_motorDirection(DIRN_STOP);
             break;
-        }
-        if(ass()){
-            printf(" \n");
-        }
         
         nanosleep(&(struct timespec){0, 20*1000*1000}, NULL);
-    }
+        }  
     
+    }
 
     return 0;
 }
