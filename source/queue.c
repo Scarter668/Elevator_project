@@ -6,7 +6,8 @@
 
 #include "queue.h"
 #include <assert.h>
-
+#include <stdlib.h>
+#include <stdio.h>
 
 
 static Order_queue_t m_order_queue;
@@ -14,17 +15,25 @@ static Order_queue_t m_order_queue;
 
 
 void queue_init(){
-    m_order_queue.p_firstOrder = NULL;
-    m_order_queue.p_lastOrder = NULL;
+
+    m_order_queue.p_firstOrder = order_createOrder(NULL);
+    m_order_queue.p_end = m_order_queue.p_firstOrder;
     m_order_queue.size = 0;
 }
 
-bool queue_orderExist(Button_t* button){
+
+void queue_freeOrder(Order_t* order){
+
+    free(order->p_orderButton);
+    free(order);
+}
+
+bool queue_buttonExist(Button_t* button){
     assert(button != NULL);
     if(m_order_queue.size >0){
 
         Order_t* p_order = m_order_queue.p_firstOrder;
-        while(p_order != NULL ){
+        while(p_order != m_order_queue.p_end){
 
             if(button_equalButtons(p_order->p_orderButton, button)){
                 //printf("Was true\n");
@@ -38,44 +47,89 @@ bool queue_orderExist(Button_t* button){
 }
 
 
-void queue_createOrder(Button_t* button){
+
+
+
+void queue_insertOrderInFront(Order_t* p_insert, Order_t* p_infront){
+
+    assert(p_insert);
+    assert(p_infront);
+    Order_t* prev = p_infront->prevOrder;
+
+    //printf("before adding order %d\n", p_insert->p_orderButton->floor_level); 
+    if(prev ){
+        prev->nextOrder = p_insert;
+        p_insert->prevOrder = prev;
+
+        p_insert->nextOrder = p_infront;
+        p_infront->prevOrder = p_insert;
+
+    } else{
+
+        p_insert->nextOrder = p_infront;
+        p_infront->prevOrder = p_insert;
+        p_insert->prevOrder = NULL;
+        
+        
+        m_order_queue.p_firstOrder = p_insert; 
+        //printf("Added order %d\n", p_insert->p_orderButton->floor_level); 
+    }
+    m_order_queue.size++;
+
+}
+
+void queue_appendOrder(Order_t* p_order){
+    assert(p_order);
+    queue_insertOrderInFront(p_order,m_order_queue.p_end);
+}
+
+
+void queue_deleteOrder(Order_t* p_order){
+
+    if(p_order){
+
+        Order_t* prev = p_order->prevOrder;
+        Order_t* next = p_order->nextOrder;
+        if(prev){
+            prev->nextOrder = next;
+        }
+        if(next){
+            next->prevOrder = prev;
+        }
+        p_order->nextOrder = NULL;
+        p_order->prevOrder = NULL;
+        queue_freeOrder(p_order);
+            
+    }
+    m_order_queue.size--;
+
+}
+
+
+
+void queue_addOrder(Button_t* button){
     
     
-    if( !queue_orderExist(button)){ //order not found
+    if( !queue_buttonExist(button)){ //order not found
         //debug
         printf("I am in order\n");
         
 
         //have to implemetent a check if malloc returns NULL
         //copy the context of button 
-        Button_t* p_button = malloc(sizeof(Button_t));
-        p_button->button_type = button->button_type;
-        p_button->floor_level_from = button->floor_level_from;
+        Button_t* p_button = button_copyButton(button);
 
-
-        Order_t* p_order = malloc(sizeof(Order_t)); // = {button, NULL, NULL};
-        p_order->p_orderButton = p_button;
-        p_order->nextOrder = NULL;
-        p_order->prevOrder = NULL; 
+        Order_t* p_order = order_createOrder(p_button);
         
 
-        if (m_order_queue.size == 0){
-            m_order_queue.p_firstOrder = p_order;
-            m_order_queue.p_lastOrder = p_order;
-            m_order_queue.size = 1;
+        //trenger her selektiv logikk
 
-        } else{
-            //trenger her selektiv logikk
-
-            //for now
-            p_order->prevOrder = m_order_queue.p_lastOrder;
-            m_order_queue.p_lastOrder->nextOrder = p_order;
-            m_order_queue.p_lastOrder  = p_order;
-            m_order_queue.size++;
+       //for now
+        queue_appendOrder(p_order);
             
-            printf("Made order order\n");
+        printf("Made order order\n");
 
-        }
+        
 
     }
 
@@ -83,22 +137,24 @@ void queue_createOrder(Button_t* button){
 
 void queue_print_queue(){
     Order_t* ord = m_order_queue.p_firstOrder;
-    while ( ord!= NULL){
-        printf("THE order is from floor %d\n",ord->p_orderButton->floor_level_from);
+    while ( ord != m_order_queue.p_end){
+        printf("THE order is from floor %d\n",ord->p_orderButton->floor_level);
         ord = ord->nextOrder;
     }
-    printf("There was %d orders", m_order_queue.size);
+    printf("There was %d orders\n\n", m_order_queue.size);
     
 }
+
 
 
 void queue_clear_all(){
     
     Order_t* next; 
-    while(m_order_queue.p_firstOrder){
+    while(m_order_queue.p_firstOrder != m_order_queue.p_end){
         
         next = m_order_queue.p_firstOrder->nextOrder;
-        free(m_order_queue.p_firstOrder);
+        queue_freeOrder(m_order_queue.p_firstOrder);
+        //queue_deleteOrder(m_order_queue.p_firstOrder);
         m_order_queue.p_firstOrder = next;
     }
     m_order_queue.size = 0;

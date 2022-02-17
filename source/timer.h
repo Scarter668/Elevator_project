@@ -8,15 +8,9 @@
 //#include <unistd.h>
 
 #include <time.h>
+#include "defines.h"
 
 
-/**
- * @brief Definerd @c bool , @c true , and @c false
- * in order to increase readability
- */
-#define bool int
-#define true 1
-#define false 0
 
 /**
  * @brief The timeout lenght in seconds

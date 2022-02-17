@@ -11,6 +11,7 @@
 
 #include "timer.h"
 #include "FSM.h"
+#include "defines.h"
 
 //to test
 #include "queue.h"
@@ -18,9 +19,9 @@
 
 
 
-#define bool int
-#define true 1
-#define false 0
+
+
+
 static bool was_obstruction = false;
 
 
@@ -37,21 +38,21 @@ int main(){
 
     
     Button_t b;
-    b.floor_level_from = 1;
+    b.floor_level = 1;
     b.button_type = BUTTON_CAB;
     //printf("Val1 %d \n", b.floor_level_from);
 
-    queue_createOrder(&b);
-    b.floor_level_from = 2;
+    queue_addOrder(&b);
+    b.floor_level = 2;
     //printf("Val2 %d \n", b.floor_level_from);
 
-    queue_createOrder(&b);
+    queue_addOrder(&b);
 
-    b.floor_level_from = 3;
-    queue_createOrder(&b);
+    b.floor_level = 3;
+    queue_addOrder(&b);
 
-    b.floor_level_from = 1;
-    queue_createOrder(&b);
+    b.floor_level= 1;
+    queue_addOrder(&b);
     //printf("Val3 %d \n", b.floor_level_from);
 
 

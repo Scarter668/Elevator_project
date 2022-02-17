@@ -7,20 +7,13 @@
 #pragma once
 
 #include "order.h"
-#include <stdlib.h>
-#include <stdio.h>
-/**
- * @brief Definerd @c bool , @c true , and @c false
- * in order to increase readability
- */
-#define bool int
-#define true 1
-#define false 0
 
+
+#include "defines.h"
 
 typedef struct Order_queue_t{
     Order_t* p_firstOrder;
-    Order_t* p_lastOrder;
+    Order_t* p_end;
     int size;
 
 }Order_queue_t;
@@ -31,7 +24,7 @@ typedef struct Order_queue_t{
 
 void queue_init();
 
-void queue_createOrder(Button_t* button);
+void queue_addOrder(Button_t* button);
 
 
 //test func
