@@ -32,6 +32,8 @@ static bool m_active_timer;
  */
 static time_t m_clock_start;
 
+
+
 void timer_start(){
 
     m_active_timer = true;

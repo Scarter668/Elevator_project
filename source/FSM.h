@@ -6,14 +6,8 @@
 
 #pragma once
 
-/**
- * @brief Definerd @c bool , @c true , and @c false
- * in order to increase readability
- */
-#define bool int
-#define true 1
-#define false 0
-
+#include "defines.h"
+#include "queue.h"
 
 
 typedef enum {
@@ -27,22 +21,26 @@ typedef enum {
     emergencyStop
 }FSM_states;
 
-typedef enum OrderDirection{
-    orderUP = 0,
-    orderDown
-} OrderDirection;
 
 
+typedef enum ElevatorDirection{
+    ElevatorUP = 0,
+    ElevatorDown,
+    ElevatorNewtral
+} ElevatorDirection;
 
-
-static FSM_states m_FSM_currentState;
 
 
 typedef struct{
-    /* data */
-}elevatorVariables;
+    int current_floorlevel;
+    bool emergency_stop;
+    bool active_obstruction;
+    bool door_open;
+    int requested_floor;
+    ElevatorDirection elevator_direction;
+    int button_pressed[NUMBER_OF_BUTTONS];
 
-static bool m_activeObstruction;
+}ElevatorVariables;
 
 
 
@@ -52,5 +50,15 @@ static bool m_activeObstruction;
 void FSM_init();
 
 
-void change_state();
+void FSM_change_state();
 
+
+
+void FSM_registerButton(int floor, int button, bool pressed);
+
+
+void FSM_cleanUP();
+
+
+
+void FSM_printButtons();

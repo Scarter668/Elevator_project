@@ -31,3 +31,12 @@ Button_t* button_copyButton(Button_t* button){
     }
     return NULL;
 }
+
+Button_t* button_createButton(int floor, int button){
+
+    Button_t* p_button = malloc(sizeof(Button_t));
+    p_button->floor_level = floor;
+    p_button->button_type = button; 
+    return p_button;
+    
+}

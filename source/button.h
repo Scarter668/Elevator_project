@@ -25,3 +25,5 @@ bool button_equalButtons(Button_t* first, Button_t* second);
 
 Button_t* button_copyButton(Button_t* button);
 
+
+Button_t* button_createButton(int floor, int button);

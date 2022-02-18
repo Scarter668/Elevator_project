@@ -12,6 +12,16 @@
 
 static Order_queue_t m_order_queue;
 
+//hjelpefunksjoner
+void queue_freeOrder(Order_t* order);
+
+void queue_insertOrderInFront(Order_t* p_insert, Order_t* p_infront);
+
+void queue_appendOrder(Order_t* p_order);
+
+void queue_deleteOrder(Order_t* p_order);
+
+bool queue_buttonExist(Button_t* button);
 
 
 void queue_init(){
@@ -20,91 +30,6 @@ void queue_init(){
     m_order_queue.p_end = m_order_queue.p_firstOrder;
     m_order_queue.size = 0;
 }
-
-
-void queue_freeOrder(Order_t* order){
-
-    free(order->p_orderButton);
-    free(order);
-}
-
-bool queue_buttonExist(Button_t* button){
-    assert(button != NULL);
-    if(m_order_queue.size >0){
-
-        Order_t* p_order = m_order_queue.p_firstOrder;
-        while(p_order != m_order_queue.p_end){
-
-            if(button_equalButtons(p_order->p_orderButton, button)){
-                //printf("Was true\n");
-                return true;
-            }
-
-            p_order = p_order->nextOrder;
-        }
-    }
-    return false;
-}
-
-
-
-
-
-void queue_insertOrderInFront(Order_t* p_insert, Order_t* p_infront){
-
-    assert(p_insert);
-    assert(p_infront);
-    Order_t* prev = p_infront->prevOrder;
-
-    //printf("before adding order %d\n", p_insert->p_orderButton->floor_level); 
-    if(prev ){
-        prev->nextOrder = p_insert;
-        p_insert->prevOrder = prev;
-
-        p_insert->nextOrder = p_infront;
-        p_infront->prevOrder = p_insert;
-
-    } else{
-
-        p_insert->nextOrder = p_infront;
-        p_infront->prevOrder = p_insert;
-        p_insert->prevOrder = NULL;
-        
-        
-        m_order_queue.p_firstOrder = p_insert; 
-        //printf("Added order %d\n", p_insert->p_orderButton->floor_level); 
-    }
-    m_order_queue.size++;
-
-}
-
-void queue_appendOrder(Order_t* p_order){
-    assert(p_order);
-    queue_insertOrderInFront(p_order,m_order_queue.p_end);
-}
-
-
-void queue_deleteOrder(Order_t* p_order){
-
-    if(p_order){
-
-        Order_t* prev = p_order->prevOrder;
-        Order_t* next = p_order->nextOrder;
-        if(prev){
-            prev->nextOrder = next;
-        }
-        if(next){
-            next->prevOrder = prev;
-        }
-        p_order->nextOrder = NULL;
-        p_order->prevOrder = NULL;
-        queue_freeOrder(p_order);
-            
-    }
-    m_order_queue.size--;
-
-}
-
 
 
 void queue_addOrder(Button_t* button){
@@ -158,4 +83,91 @@ void queue_clear_all(){
         m_order_queue.p_firstOrder = next;
     }
     m_order_queue.size = 0;
+}
+
+
+
+void queue_freeOrder(Order_t* order){
+
+    free(order->p_orderButton);
+    free(order);
+}
+
+bool queue_buttonExist(Button_t* button){
+    assert(button != NULL);
+    if(m_order_queue.size >0){
+
+        Order_t* p_order = m_order_queue.p_firstOrder;
+        while(p_order != m_order_queue.p_end){
+
+            if(button_equalButtons(p_order->p_orderButton, button)){
+                //printf("Was true\n");
+                return true;
+            }
+
+            p_order = p_order->nextOrder;
+        }
+    }
+    return false;
+}
+
+
+void queue_insertOrderInFront(Order_t* p_insert, Order_t* p_infront){
+
+    assert(p_insert);
+    assert(p_infront);
+    Order_t* prev = p_infront->prevOrder;
+
+    //printf("before adding order %d\n", p_insert->p_orderButton->floor_level); 
+    if(prev ){
+        prev->nextOrder = p_insert;
+        p_insert->prevOrder = prev;
+
+        p_insert->nextOrder = p_infront;
+        p_infront->prevOrder = p_insert;
+
+    } else{
+
+        p_insert->nextOrder = p_infront;
+        p_infront->prevOrder = p_insert;
+        p_insert->prevOrder = NULL;
+        
+        
+        m_order_queue.p_firstOrder = p_insert; 
+        //printf("Added order %d\n", p_insert->p_orderButton->floor_level); 
+    }
+    m_order_queue.size++;
+
+}
+
+
+void queue_appendOrder(Order_t* p_order){
+    assert(p_order);
+    queue_insertOrderInFront(p_order,m_order_queue.p_end);
+}
+
+void queue_deleteOrder(Order_t* p_order){
+
+    if(p_order && p_order != m_order_queue.p_end){
+
+        Order_t* prev = p_order->prevOrder;
+        Order_t* next = p_order->nextOrder;
+
+        if(p_order == m_order_queue.p_firstOrder){
+            m_order_queue.p_firstOrder = next;
+        }
+
+        if(prev){
+            prev->nextOrder = next;
+        }
+        if(next){
+            next->prevOrder = prev;
+        }
+        p_order->nextOrder = NULL;
+        p_order->prevOrder = NULL;
+        queue_freeOrder(p_order);
+            
+        m_order_queue.size--;
+    }
+
 }

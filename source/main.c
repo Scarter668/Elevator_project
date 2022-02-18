@@ -29,6 +29,7 @@ int main(){
     elevio_init();
     timer_init();
     queue_init();
+    FSM_init();
     
     printf("=== Example Program ===\n");
     printf("Press the stop button on the elevator panel to exit\n");
@@ -58,7 +59,7 @@ int main(){
 
     while(1){
         int floor = elevio_floorSensor();
-        printf("floor: %d \n",floor);
+        //printf("floor: %d \n",floor);
 
         if(floor == 0){
             elevio_motorDirection(DIRN_UP);
@@ -72,6 +73,7 @@ int main(){
         for(int f = 0; f < N_FLOORS; f++){
             for(int b = 0; b < N_BUTTONS; b++){
                 int btnPressed = elevio_callButton(f, b);
+                FSM_registerButton(f,b,btnPressed);
                 if(btnPressed){
                     if(f>floor && floor != -1){
                         elevio_motorDirection(DIRN_UP);
@@ -106,6 +108,7 @@ int main(){
                 if(timer_isTimeout()){ //if timeout
                 elevio_doorOpenLamp(0);
                 queue_print_queue();
+                FSM_printButtons();
                 }
             
             }
