@@ -24,7 +24,6 @@
 
 static bool was_obstruction = false;
 
-
 int main(){
     elevio_init();
     timer_init();
@@ -38,27 +37,28 @@ int main(){
 
 
     
-    Button_t b;
-    b.floor_level = 1;
-    b.button_type = BUTTON_CAB;
-    //printf("Val1 %d \n", b.floor_level_from);
+    // Button_t b;
+    // b.floor_level = 1;
+    // b.button_type = BUTTON_CAB;
+    // //printf("Val1 %d \n", b.floor_level_from);
 
-    queue_addOrder(&b);
-    b.floor_level = 2;
-    //printf("Val2 %d \n", b.floor_level_from);
+    // queue_addOrder(&b);
+    // b.floor_level = 2;
+    // //printf("Val2 %d \n", b.floor_level_from);
 
-    queue_addOrder(&b);
+    // queue_addOrder(&b);
 
-    b.floor_level = 3;
-    queue_addOrder(&b);
+    // b.floor_level = 3;
+    // queue_addOrder(&b);
 
-    b.floor_level= 1;
-    queue_addOrder(&b);
-    //printf("Val3 %d \n", b.floor_level_from);
+    // b.floor_level= 1;
+    // queue_addOrder(&b);
+    // //printf("Val3 %d \n", b.floor_level_from);
 
 
+    int floor, stopBtn, ObsBtn;
     while(1){
-        int floor = elevio_floorSensor();
+        floor = elevio_floorSensor();
         //printf("floor: %d \n",floor);
 
         if(floor == 0){
@@ -73,7 +73,10 @@ int main(){
         for(int f = 0; f < N_FLOORS; f++){
             for(int b = 0; b < N_BUTTONS; b++){
                 int btnPressed = elevio_callButton(f, b);
+                
+
                 FSM_registerButton(f,b,btnPressed);
+                
                 if(btnPressed){
                     if(f>floor && floor != -1){
                         elevio_motorDirection(DIRN_UP);
@@ -81,14 +84,21 @@ int main(){
                     if(f < floor &&  floor != -1){
                         elevio_motorDirection(DIRN_DOWN);
                     }
-                    queue_clear_all();
                 }
-                elevio_buttonLamp(f, b, btnPressed);
             }
         }
-        if(floor !=-1){
-            elevio_floorIndicator(floor);
-        }
+
+        FSM_registerFloor( floor);
+
+        stopBtn = elevio_stopButton();
+        FSM_registerEmergency(stopBtn);
+
+        ObsBtn = elevio_obstruction();
+        FSM_registerObstruction(ObsBtn);
+
+        FSM_updateState();
+
+        
 
         if(elevio_obstruction()){
             elevio_stopLamp(1);
@@ -115,12 +125,16 @@ int main(){
 
         }
         
+        
         if(elevio_stopButton()){
             elevio_motorDirection(DIRN_STOP);
-            break;
+            //break;
+
+            queue_clear_all();
         
+        }
+
         nanosleep(&(struct timespec){0, 20*1000*1000}, NULL);
-        }  
     
     }
 

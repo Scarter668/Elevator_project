@@ -32,6 +32,7 @@ Button_t* button_copyButton(Button_t* button){
     return NULL;
 }
 
+//not needed
 Button_t* button_createButton(int floor, int button){
 
     Button_t* p_button = malloc(sizeof(Button_t));

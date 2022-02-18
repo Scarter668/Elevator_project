@@ -21,7 +21,9 @@ void queue_appendOrder(Order_t* p_order);
 
 void queue_deleteOrder(Order_t* p_order);
 
-bool queue_buttonExist(Button_t* button);
+void queue_removeOrder(Order_t* p_order);
+
+
 
 
 void queue_init(){
@@ -30,6 +32,10 @@ void queue_init(){
     m_order_queue.p_end = m_order_queue.p_firstOrder;
     m_order_queue.size = 0;
 }
+
+// Order_queue_t* queue_getQueuePtr(){
+//     return &m_order_queue;
+// }
 
 
 void queue_addOrder(Button_t* button){
@@ -60,37 +66,19 @@ void queue_addOrder(Button_t* button){
 
 }
 
-void queue_print_queue(){
-    Order_t* ord = m_order_queue.p_firstOrder;
-    while ( ord != m_order_queue.p_end){
-        printf("THE order is from floor %d\n",ord->p_orderButton->floor_level);
-        ord = ord->nextOrder;
-    }
-    printf("There was %d orders\n\n", m_order_queue.size);
+void queue_sortAndArrange(ElevatorDirection dir){
+    
+    //have to fill with sorting
+
     
 }
 
 
-
-void queue_clear_all(){
-    
-    Order_t* next; 
-    while(m_order_queue.p_firstOrder != m_order_queue.p_end){
-        
-        next = m_order_queue.p_firstOrder->nextOrder;
-        queue_freeOrder(m_order_queue.p_firstOrder);
-        //queue_deleteOrder(m_order_queue.p_firstOrder);
-        m_order_queue.p_firstOrder = next;
+int queue_getNextfloor(){
+    if(m_order_queue.size == 0){
+        return NO_FLOOR;
     }
-    m_order_queue.size = 0;
-}
-
-
-
-void queue_freeOrder(Order_t* order){
-
-    free(order->p_orderButton);
-    free(order);
+    return m_order_queue.p_firstOrder->p_orderButton->floor_level;
 }
 
 bool queue_buttonExist(Button_t* button){
@@ -110,6 +98,39 @@ bool queue_buttonExist(Button_t* button){
     }
     return false;
 }
+
+void queue_print_queue(){
+    Order_t* ord = m_order_queue.p_firstOrder;
+    while ( ord != m_order_queue.p_end){
+        printf("THE order is from floor %d\n",ord->p_orderButton->floor_level);
+        ord = ord->nextOrder;
+    }
+    printf("There was %d orders\n\n", m_order_queue.size);
+    
+}
+
+
+
+void queue_clear_all(){
+    
+    Order_t* next; 
+    while(m_order_queue.p_firstOrder != m_order_queue.p_end){
+        
+        next = m_order_queue.p_firstOrder->nextOrder;
+        queue_deleteOrder(m_order_queue.p_firstOrder);
+        m_order_queue.p_firstOrder = next;
+    }
+    m_order_queue.size = 0;
+}
+
+
+
+void queue_freeOrder(Order_t* order){
+
+    free(order->p_orderButton);
+    free(order);
+}
+
 
 
 void queue_insertOrderInFront(Order_t* p_insert, Order_t* p_infront){
@@ -148,6 +169,13 @@ void queue_appendOrder(Order_t* p_order){
 
 void queue_deleteOrder(Order_t* p_order){
 
+    queue_removeOrder(p_order);
+    
+    queue_freeOrder(p_order);
+
+}
+
+void queue_removeOrder(Order_t* p_order){
     if(p_order && p_order != m_order_queue.p_end){
 
         Order_t* prev = p_order->prevOrder;
@@ -165,9 +193,6 @@ void queue_deleteOrder(Order_t* p_order){
         }
         p_order->nextOrder = NULL;
         p_order->prevOrder = NULL;
-        queue_freeOrder(p_order);
-            
         m_order_queue.size--;
     }
-
 }
