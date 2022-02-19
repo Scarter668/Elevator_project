@@ -22,18 +22,16 @@
 
 
 
-static bool was_obstruction = false;
+//static bool was_obstruction = false;
 
 int main(){
-    elevio_init();
-    timer_init();
-    queue_init();
+    
     FSM_init();
     
     printf("=== Example Program ===\n");
     printf("Press the stop button on the elevator panel to exit\n");
 
-    elevio_motorDirection(DIRN_UP);
+    //elevio_motorDirection(DIRN_UP);
 
 
     
@@ -61,13 +59,13 @@ int main(){
         floor = elevio_floorSensor();
         //printf("floor: %d \n",floor);
 
-        if(floor == 0){
-            elevio_motorDirection(DIRN_UP);
-        }
+        // if(floor == 0){
+        //     elevio_motorDirection(DIRN_UP);
+        // }
 
-        if(floor == N_FLOORS-1){
-            elevio_motorDirection(DIRN_DOWN);
-        }
+        // if(floor == N_FLOORS-1){
+        //     elevio_motorDirection(DIRN_DOWN);
+        // }
 
 
         for(int f = 0; f < N_FLOORS; f++){
@@ -77,14 +75,14 @@ int main(){
 
                 FSM_registerButton(f,b,btnPressed);
                 
-                if(btnPressed){
-                    if(f>floor && floor != -1){
-                        elevio_motorDirection(DIRN_UP);
-                    }
-                    if(f < floor &&  floor != -1){
-                        elevio_motorDirection(DIRN_DOWN);
-                    }
-                }
+                // if(btnPressed){
+                //     if(f>floor && floor != -1){
+                //         elevio_motorDirection(DIRN_UP);
+                //     }
+                //     if(f < floor &&  floor != -1){
+                //         elevio_motorDirection(DIRN_DOWN);
+                //     }
+                // }
             }
         }
 
@@ -92,47 +90,51 @@ int main(){
 
         stopBtn = elevio_stopButton();
         FSM_registerEmergency(stopBtn);
+        
 
         ObsBtn = elevio_obstruction();
         FSM_registerObstruction(ObsBtn);
 
         FSM_updateState();
 
+        queue_print_queue();
+        FSM_printButtons();
+        
         
 
-        if(elevio_obstruction()){
-            elevio_stopLamp(1);
-            elevio_doorOpenLamp(1);
-            was_obstruction = true;
+        // if(elevio_obstruction()){
+        //     elevio_stopLamp(1);
+        //     elevio_doorOpenLamp(1);
+        //     was_obstruction = true;
             
-        } else {
-            elevio_stopLamp(0);
-            if(was_obstruction){
-                was_obstruction = false;
-                timer_start();
-            }
-            if(!timer_isActive()){ // if not active timer
-                elevio_doorOpenLamp(0);
-            } else{ 
+        // } else {
+        //     elevio_stopLamp(0);
+        //     if(was_obstruction){
+        //         was_obstruction = false;
+        //         timer_start();
+        //     }
+        //     if(!timer_isActive()){ // if not active timer
+        //         elevio_doorOpenLamp(0);
+        //     } else{ 
 
-                if(timer_isTimeout()){ //if timeout
-                elevio_doorOpenLamp(0);
-                queue_print_queue();
-                FSM_printButtons();
-                }
+        //         if(timer_isTimeout()){ //if timeout
+        //         elevio_doorOpenLamp(0);
+        //         queue_print_queue();
+        //         FSM_printButtons();
+        //         }
             
-            }
+        //     }
 
-        }
+        // }
         
         
-        if(elevio_stopButton()){
-            elevio_motorDirection(DIRN_STOP);
-            //break;
+        // if(elevio_stopButton()){
+        //     elevio_motorDirection(DIRN_STOP);
+        //     //break;
 
-            queue_clear_all();
+        //     queue_clear_all();
         
-        }
+        // }
 
         nanosleep(&(struct timespec){0, 20*1000*1000}, NULL);
     

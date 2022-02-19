@@ -29,6 +29,8 @@ void queue_init();
 
 void queue_addOrder(Button_t* button);
 
+void queue_removeOrders(int floor);
+
 void queue_sortAndArrange(ElevatorDirection dir);
 
 int queue_getNextfloor();

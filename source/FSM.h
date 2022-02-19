@@ -14,13 +14,13 @@
 
 typedef enum {
     initializing = 0,
-    idle,
-    readying,
-    elevatorDown,
-    elevatorUp,
-    floorArrived,
-    obstructionWait,
-    emergencyStop
+    idle,   // 1
+    readying, // 2
+    elevatorDown, //3
+    elevatorUp, // 4
+    floorArrived, //5
+    obstructionWait, //6
+    emergencyStop // 7
 }FSM_states;
 
 
@@ -30,6 +30,7 @@ typedef enum {
 
 typedef struct{
     int current_floorlevel; //oppdateres i main
+    float virtual_floorlevel; // eks. 2.5 , oppdatereis i state update 
     bool emergency_stop;    //fra main
     bool active_obstruction;    // fra main
     bool door_open;             // fikses i change of state

@@ -25,7 +25,7 @@
 
 
 /**
- * @brief Starts the timer by regitering the current time.
+ * @brief Starts the timer by registering the current time.
  */
 void timer_start();
 
@@ -49,3 +49,9 @@ bool timer_isTimeout();
  * @brief Initiates the static variables used by timer
  */
 void timer_init();
+
+
+/**
+ * @brief Stop timer by setting the timer to false.
+ */
+void timer_stop();

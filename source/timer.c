@@ -41,7 +41,7 @@ void timer_start(){
     m_clock_start = time(NULL);
 }
 
-void stop_timer(){
+void timer_stop(){
     m_active_timer = false;
 }
 
@@ -53,7 +53,7 @@ bool timer_isTimeout(){
     if(m_active_timer){
 
         if(difftime(time(NULL) ,m_clock_start) >= TIMEOUT_LENGHT){
-            stop_timer();
+            timer_stop();
             return true;
         }
     }

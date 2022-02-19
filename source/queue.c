@@ -66,13 +66,44 @@ void queue_addOrder(Button_t* button){
 
 }
 
+void queue_removeOrders(int floor){
+
+
+
+    //printf("REMOVED ORDER FROM FLOOR %d\n", floor);
+
+
+    //printf("Before removal\n");
+    queue_print_queue();
+    Order_t* order = m_order_queue.p_firstOrder;
+    while(order != m_order_queue.p_end){
+        
+        
+        if(order->p_orderButton->floor_level == floor){ ///found a match
+            
+            Order_t* foundMatch = order;
+            order = order->nextOrder;
+            queue_deleteOrder(foundMatch);
+        
+        } else{ //did not find a match
+
+            order = order->nextOrder;
+        }
+        
+    }
+    // printf("After Removal update:\n");
+    // queue_print_queue();
+    // printf("END\n");
+
+}
+
 void queue_sortAndArrange(ElevatorDirection dir){
     
     //have to fill with sorting
 
     
 }
-
+    
 
 int queue_getNextfloor(){
     if(m_order_queue.size == 0){
