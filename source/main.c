@@ -22,7 +22,7 @@
 
 
 
-//static bool was_obstruction = false;
+static bool stop = false;
 
 int main(){
     
@@ -89,7 +89,11 @@ int main(){
         FSM_registerFloor( floor);
 
         stopBtn = elevio_stopButton();
-        FSM_registerEmergency(stopBtn);
+        if(stopBtn){
+            stop = !stop;
+        }
+
+        FSM_registerEmergency(stop);
         
 
         ObsBtn = elevio_obstruction();

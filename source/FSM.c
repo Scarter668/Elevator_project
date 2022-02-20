@@ -18,6 +18,9 @@ static FSM_states m_FSM_memoryState;
 
 static ElevatorVariables m_FSM_elevatorVariables; 
 
+static bool FSM_hitFloor;
+
+
 
 bool FSM_validate_button(int floor, int button);
 
@@ -35,7 +38,7 @@ void FSM_deleteAllOrders();
 
 void FSM_setDoorOpen(bool doorstate);
 
-void FSM_stopAndUpdateIfArrived();
+bool FSM_stopAndUpdateIfArrived();
 
 
 
@@ -90,6 +93,8 @@ void FSM_init(){
 
     m_FSM_elevatorVariables.elevator_direction = ElevatorNewtral;
 
+    FSM_hitFloor = false;
+    
     FSM_change_state();
 
 }  
@@ -110,7 +115,7 @@ void FSM_registerButton(int floor, int button, bool pressed){
 
 
 void FSM_registerFloor(int floor){
-    if((floor != NO_FLOOR) && (floor >= 0 ) && (floor < N_FLOORS) ){
+    if((floor == NO_FLOOR) || ((floor >= 0 ) && (floor < N_FLOORS)) ){
         
         m_FSM_elevatorVariables.current_floorlevel = floor;
 
@@ -136,7 +141,7 @@ void FSM_updateState(){
         FSM_updatequeue();
         m_FSM_elevatorVariables.requested_floor = queue_getNextfloor();
 
-        m_FSM_elevatorVariables.virtual_floorlevel = (float) m_FSM_elevatorVariables.current_floorlevel;
+        printf("Requested floor: %d", m_FSM_elevatorVariables.requested_floor );
 
         if(m_FSM_elevatorVariables.current_floorlevel != NO_FLOOR){
 
@@ -170,6 +175,10 @@ void FSM_change_state(){
                 FSM_registerFloor( floor);
                 m_FSM_currentState = idle;
             }
+
+        
+            m_FSM_elevatorVariables.virtual_floorlevel = (float) m_FSM_elevatorVariables.current_floorlevel;
+        
         }
         break;
 
@@ -192,9 +201,11 @@ void FSM_change_state(){
             
         }
 
+
         if(m_FSM_elevatorVariables.requested_floor != NO_FLOOR){
             
             m_FSM_currentState = readying;
+
             
         }
 
@@ -211,34 +222,41 @@ void FSM_change_state(){
             break;
         }
 
-        if(m_FSM_elevatorVariables.door_open){
+        if(timer_isActive() && timer_isTimeout()){
             
             FSM_setDoorOpen(false);
+            
+        }
+
+
+        if(!m_FSM_elevatorVariables.door_open){
+            
+            float virt_floor = m_FSM_elevatorVariables.virtual_floorlevel;
+            float to_floor = (float) m_FSM_elevatorVariables.requested_floor;
+            if(virt_floor > to_floor ){
+
+                elevio_motorDirection(DIRN_DOWN);
+                m_FSM_elevatorVariables.virtual_floorlevel -= 0.5;
+                m_FSM_currentState = elevatorDown;
+
+            } else if( virt_floor == to_floor){
+                printf("virt_floor: %f, to_floor: %f\n",virt_floor,to_floor);
+                FSM_setDoorOpen(true);
+                timer_start();
+                queue_removeOrders(to_floor);
+                m_FSM_currentState = floorArrived;
+            } else{
+                
+                elevio_motorDirection(DIRN_UP);
+                m_FSM_elevatorVariables.virtual_floorlevel += 0.5;
+                m_FSM_currentState = elevatorUp;
+
+            }
+            
         }
          
 
         
-        float virt_floor = m_FSM_elevatorVariables.virtual_floorlevel;
-        float to_floor = (float) m_FSM_elevatorVariables.requested_floor;
-        if(virt_floor > to_floor ){
-
-            elevio_motorDirection(DIRN_DOWN);
-            m_FSM_elevatorVariables.virtual_floorlevel -= 0.5;
-            m_FSM_currentState = elevatorDown;
-
-        } else if( virt_floor == to_floor){
-            printf("virt_floor: %f, to_floor: %f\n",virt_floor,to_floor);
-            FSM_setDoorOpen(true);
-            timer_start();
-            queue_removeOrders(to_floor);
-            m_FSM_currentState = floorArrived;
-        } else{
-            
-            elevio_motorDirection(DIRN_UP);
-            m_FSM_elevatorVariables.virtual_floorlevel += 0.5;
-            m_FSM_currentState = elevatorUp;
-
-        }
 
         break;
     
@@ -247,8 +265,21 @@ void FSM_change_state(){
             break;
         }
         
+        if(FSM_stopAndUpdateIfArrived()){
+            break;
+        }
 
-        FSM_stopAndUpdateIfArrived();
+        if(m_FSM_elevatorVariables.current_floorlevel != NO_FLOOR){
+            m_FSM_elevatorVariables.virtual_floorlevel = (float) m_FSM_elevatorVariables.current_floorlevel;
+            FSM_hitFloor = true;
+        } else{
+            if(FSM_hitFloor){
+                m_FSM_elevatorVariables.virtual_floorlevel -= 0.5;
+                FSM_hitFloor = false;
+            }
+        }
+
+        
 
         
         break;
@@ -258,11 +289,23 @@ void FSM_change_state(){
             break;
         }
 
-        
+        if(m_FSM_elevatorVariables.current_floorlevel != NO_FLOOR){
+            m_FSM_elevatorVariables.virtual_floorlevel = (float) m_FSM_elevatorVariables.current_floorlevel;
+        }
 
+        if(FSM_stopAndUpdateIfArrived()){
+            break;
+        }
 
-        FSM_stopAndUpdateIfArrived();
-
+        if(m_FSM_elevatorVariables.current_floorlevel != NO_FLOOR){
+            m_FSM_elevatorVariables.virtual_floorlevel = (float) m_FSM_elevatorVariables.current_floorlevel;
+            FSM_hitFloor = true;
+        } else{
+            if(FSM_hitFloor){
+                m_FSM_elevatorVariables.virtual_floorlevel += 0.5;
+                FSM_hitFloor = false;
+            }
+        }
 
         break;
 
@@ -279,7 +322,7 @@ void FSM_change_state(){
         }
 
         
-
+        
         if(timer_isActive() && timer_isTimeout()){
             
             FSM_setDoorOpen(false);
@@ -320,7 +363,9 @@ void FSM_change_state(){
         if(!m_FSM_elevatorVariables.emergency_stop){
             
             if(m_FSM_elevatorVariables.door_open){
-                FSM_setDoorOpen(false);
+                if(!m_FSM_elevatorVariables.active_obstruction){
+                    FSM_setDoorOpen(false);
+                }
                 timer_start();
             }
             elevio_stopLamp(false);
@@ -496,10 +541,10 @@ void FSM_setDoorOpen(bool doorstate){
     elevio_doorOpenLamp(doorstate);
 }
 
-void FSM_stopAndUpdateIfArrived(){
+bool FSM_stopAndUpdateIfArrived(){
 
     int curr_floor = m_FSM_elevatorVariables.current_floorlevel;
-    int to_floor =  m_FSM_elevatorVariables.requested_floor;
+    int to_floor = m_FSM_elevatorVariables.requested_floor;
     if(curr_floor == to_floor){
         elevio_motorDirection(DIRN_STOP);
         FSM_setDoorOpen(true);
@@ -508,7 +553,8 @@ void FSM_stopAndUpdateIfArrived(){
         queue_removeOrders(curr_floor);
         m_FSM_elevatorVariables.virtual_floorlevel = (float) curr_floor;
         m_FSM_currentState = floorArrived;
+        return true;
     }
-
+    return false;
 
 }
